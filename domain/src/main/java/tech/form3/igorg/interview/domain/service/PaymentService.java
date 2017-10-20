@@ -3,6 +3,7 @@ package tech.form3.igorg.interview.domain.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tech.form3.igorg.interview.infrastructure.repository.PaymentRepository;
 import tech.form3.igorg.interview.model.payment.Payment;
 
@@ -15,6 +16,7 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@Transactional
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -43,7 +45,6 @@ public class PaymentService {
      *
      * @return list of all payments
      */
-    // TODO check if should fetch only payments from a certain group (e.g. organization)
     public List<Payment> getAllPayments() {
         return newArrayList(paymentRepository.findAll());
     }
@@ -51,10 +52,13 @@ public class PaymentService {
     /**
      * Updates the provided payment.
      *
-     * @param payment the payment containing the updates
+     * @param paymentUpdate the payment containing the updates
      * @return the updated (saved) payment
      */
-    public Payment updatePayment(Payment payment) {
+    public Payment updatePayment(Payment paymentUpdate) {
+        Payment payment = paymentRepository.findOne(paymentUpdate.getId(), paymentUpdate.getVersion());
+        payment.setOrganizationId(paymentUpdate.getOrganizationId());
+        payment.setPaymentAttributes(paymentUpdate.getPaymentAttributes());
         return paymentRepository.save(payment);
     }
 

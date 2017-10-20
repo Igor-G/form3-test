@@ -1,9 +1,12 @@
 package tech.form3.igorg.interview.infrastructure;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +27,15 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@ContextConfiguration(classes = Form3InfrastructureConfig.class)
+@ContextConfiguration(classes = {Form3InfrastructureConfig.class, InfrastructureTestConfig.class})
 @Transactional
 public class PaymentRepositoryIntegrationTest {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void shouldSavePayment() {
@@ -49,7 +55,6 @@ public class PaymentRepositoryIntegrationTest {
 
         // then
         assertThat(savedPayment.getId(), equalTo(payment.getId()));
-        assertThat(savedPayment.getPaymentAttributes().getId(), equalTo(paymentAttributes.getId()));
         assertThat(savedPayment.getPaymentAttributes().getAmount(), equalTo(amount));
         assertThat(savedPayment.getPaymentAttributes().getBeneficiaryParty().getAccountName(), equalTo(accountName));
     }
@@ -64,6 +69,32 @@ public class PaymentRepositoryIntegrationTest {
 
         // then
         assertThat(paymentFromDb, equalTo(payment));
+    }
+
+    @Test
+    public void shouldGetPaymentAndCheckVersionSuccessfully() {
+        // given
+        Payment payment = createAndSavePayment();
+
+        // when
+        Payment paymentFromDb = paymentRepository.findOne(payment.getId(), 0);
+
+        // then
+        assertThat(paymentFromDb, equalTo(payment));
+    }
+
+    @Test
+    public void shouldGetPaymentAndFailOnVersionMismatch() {
+        // given
+        Payment payment = createAndSavePayment();
+        expectedException.expect(OptimisticLockingFailureException.class);
+        expectedException.expectMessage("A new version of the 'Payment' is available");
+
+        // when
+        paymentRepository.findOne(payment.getId(), 1);
+
+        // then
+        // expect exception to be thrown
     }
 
     @Test

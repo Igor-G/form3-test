@@ -8,6 +8,7 @@
         <module>model</module>
         <module>infrastructure</module>
         <module>domain</module>
+        <module>application</module>
     </modules>
 
     <parent>
@@ -24,6 +25,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <exec.maven.plugin.version>1.5.0</exec.maven.plugin.version>
+        <spring.boot.dependencies.version>1.5.8.RELEASE</spring.boot.dependencies.version>
         <lombok.version>1.16.10</lombok.version>
         <flyway.version>4.2.0</flyway.version>
         <org.hibernate.persistence.annotations.version>1.0.0.Final</org.hibernate.persistence.annotations.version>

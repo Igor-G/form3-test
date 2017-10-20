@@ -1,18 +1,19 @@
 package tech.form3.igorg.interview.model.payment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tech.form3.igorg.interview.model.payment.enums.PaymentType;
+import tech.form3.igorg.interview.model.serialization.SerializationContainer;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.Version;
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -22,15 +23,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "payment")
-public class Payment {
-
-    private PaymentType paymentType;
+public class Payment implements SerializationContainer {
 
     @Id
     @Column(name = "id")
     private String id = UUID.randomUUID().toString();
 
-    // TODO ig: check version
     @Version
     @Column(name = "version")
     private Integer version;
@@ -38,8 +36,24 @@ public class Payment {
     @Column(name = "organization_id")
     private String organizationId;
 
-    // TODO make it a json (serialized as string)
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinColumn(name = "payment_attributes_id", unique = true, updatable = false)
-    private PaymentAttributes paymentAttributes;
+    @Valid
+    @Transient
+    private transient PaymentAttributes paymentAttributes;
+
+    @Column(name = "payment_attributes_serialized")
+    private String paymentAttributesSerialized;
+
+    @Override
+    public void serialize(ObjectMapper objectMapper) throws JsonProcessingException {
+        if (paymentAttributes != null) {
+            paymentAttributesSerialized = objectMapper.writeValueAsString(paymentAttributes);
+        }
+    }
+
+    @Override
+    public void deserialize(ObjectMapper objectMapper) throws IOException {
+        if (paymentAttributesSerialized != null) {
+            paymentAttributes = objectMapper.readValue(paymentAttributesSerialized, PaymentAttributes.class);
+        }
+    }
 }

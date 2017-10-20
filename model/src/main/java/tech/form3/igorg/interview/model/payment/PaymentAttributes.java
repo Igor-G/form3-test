@@ -1,37 +1,26 @@
 package tech.form3.igorg.interview.model.payment;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.UUID;
 
 /**
  * Payment attributes.
  */
 @Data
 @NoArgsConstructor
-@Entity
-@Table(name = "payment_attributes")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PaymentAttributes {
 
-    @Id
-    @Column(name = "id")
-    private String id = UUID.randomUUID().toString();
-
-    @Column(name = "amount")
     private BigDecimal amount;
 
-    @Embedded
+    @JsonProperty("beneficiary_party")
     private BeneficiaryParty beneficiaryParty;
 
-    @Column(name = "currency")
     private Currency currency;
 
 }

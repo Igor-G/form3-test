@@ -7,14 +7,17 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import tech.form3.igorg.interview.infrastructure.repository.PaymentRepository;
 import tech.form3.igorg.interview.model.payment.Payment;
+import tech.form3.igorg.interview.model.payment.PaymentAttributes;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections4.CollectionUtils.isEqualCollection;
-import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -78,16 +81,27 @@ public class PaymentServiceTest {
     @Test
     public void shouldUpdatePayment() {
         // given
-        Payment mockPayment = mock(Payment.class);
-        Payment mockReturnPayment = mock(Payment.class);
-        given(paymentRepository.save(mockPayment)).willReturn(mockReturnPayment);
+        Payment paymentFromDb = new Payment();
+        paymentFromDb.setOrganizationId("old-org-id");
+
+        Payment paymentUpdate = new Payment();
+        paymentUpdate.setVersion(2);
+        paymentUpdate.setOrganizationId("new-org-id");
+        PaymentAttributes newPaymentAttributes = new PaymentAttributes();
+        newPaymentAttributes.setAmount(new BigDecimal("5678"));
+        paymentUpdate.setPaymentAttributes(newPaymentAttributes);
+
+        given(paymentRepository.findOne(paymentUpdate.getId(), paymentUpdate.getVersion())).willReturn(paymentFromDb);
+        given(paymentRepository.save(any(Payment.class))).willAnswer(returnsFirstArg());
 
         // when
-        Payment payment = paymentService.updatePayment(mockPayment);
+        Payment payment = paymentService.updatePayment(paymentUpdate);
 
         // then
-        assertThat(payment, sameInstance(mockReturnPayment));
-        verify(paymentRepository).save(mockPayment);
+        assertThat(payment, sameInstance(paymentFromDb));
+        assertThat(paymentFromDb.getOrganizationId(), equalTo("new-org-id"));
+        assertThat(paymentFromDb.getPaymentAttributes(), equalTo(newPaymentAttributes));
+        verify(paymentRepository).save(paymentFromDb);
     }
 
     @Test
