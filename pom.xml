@@ -7,6 +7,7 @@
     <modules>
         <module>model</module>
         <module>infrastructure</module>
+        <module>domain</module>
     </modules>
 
     <parent>
@@ -26,6 +27,8 @@
         <lombok.version>1.16.10</lombok.version>
         <flyway.version>4.2.0</flyway.version>
         <org.hibernate.persistence.annotations.version>1.0.0.Final</org.hibernate.persistence.annotations.version>
+        <apache.commons.collections.version>4.1</apache.commons.collections.version>
+        <google.guava.version>21.0</google.guava.version>
     </properties>
 
     <dependencyManagement>
@@ -39,6 +42,11 @@
             <dependency>
                 <groupId>tech.form3.igorg.interview</groupId>
                 <artifactId>infrastructure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.form3.igorg.interview</groupId>
+                <artifactId>domain</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -57,6 +65,16 @@
                 <groupId>org.hibernate.javax.persistence</groupId>
                 <artifactId>hibernate-jpa-2.1-api</artifactId>
                 <version>${org.hibernate.persistence.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${apache.commons.collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google.guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
