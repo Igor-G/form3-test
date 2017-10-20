@@ -6,6 +6,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>model</module>
+        <module>infrastructure</module>
     </modules>
 
     <parent>
@@ -23,14 +24,39 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <exec.maven.plugin.version>1.5.0</exec.maven.plugin.version>
         <lombok.version>1.16.10</lombok.version>
+        <flyway.version>4.2.0</flyway.version>
+        <org.hibernate.persistence.annotations.version>1.0.0.Final</org.hibernate.persistence.annotations.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Form3 internal dependencies -->
+            <dependency>
+                <groupId>tech.form3.igorg.interview</groupId>
+                <artifactId>model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>tech.form3.igorg.interview</groupId>
+                <artifactId>infrastructure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Third-party dependencies -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.javax.persistence</groupId>
+                <artifactId>hibernate-jpa-2.1-api</artifactId>
+                <version>${org.hibernate.persistence.annotations.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
