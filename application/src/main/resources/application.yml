@@ -1,2 +1,15 @@
-spring.jpa.generate-ddl: false
-spring.jpa.hibernate.ddl-auto: none
+spring:
+  profiles:
+    active: development
+
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+    deserialization:
+      ADJUST_DATES_TO_CONTEXT_TIME_ZONE: false

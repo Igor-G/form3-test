@@ -30,6 +30,8 @@
         <flyway.version>4.2.0</flyway.version>
         <org.hibernate.persistence.annotations.version>1.0.0.Final</org.hibernate.persistence.annotations.version>
         <apache.commons.collections.version>4.1</apache.commons.collections.version>
+        <apache.commons.lang3.version>3.6</apache.commons.lang3.version>
+        <apache.commons.text.version>1.1</apache.commons.text.version>
         <google.guava.version>21.0</google.guava.version>
     </properties>
 
@@ -72,6 +74,16 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${apache.commons.collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${apache.commons.lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${apache.commons.text.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

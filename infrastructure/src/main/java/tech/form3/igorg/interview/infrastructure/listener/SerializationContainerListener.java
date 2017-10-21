@@ -7,10 +7,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.event.spi.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.form3.igorg.interview.model.exception.Form3Exception;
 import tech.form3.igorg.interview.model.serialization.SerializationContainer;
 
 import java.io.IOException;
 import java.util.Map;
+
+import static java.util.Collections.singletonList;
+import static tech.form3.igorg.interview.model.exception.errorreason.GeneralErrorReason.ERROR;
 
 /**
  * Serialization container hibernate listener (executes serialization and deserialization).
@@ -29,8 +33,7 @@ public class SerializationContainerListener
             try {
                 ((SerializationContainer) entity).deserialize(objectMapper);
             } catch (IOException e) {
-                // TODO custom exception should be created
-                throw new RuntimeException(e);
+                throw new Form3Exception(ERROR, singletonList("Error during deserialization"), e);
             }
         }
     }
@@ -60,8 +63,7 @@ public class SerializationContainerListener
             try {
                 ((SerializationContainer) entity).serialize(objectMapper);
             } catch (JsonProcessingException e) {
-                // TODO custom exception should be created
-                throw new RuntimeException(e);
+                throw new Form3Exception(ERROR, singletonList("Error during serialization"), e);
             }
         }
     }

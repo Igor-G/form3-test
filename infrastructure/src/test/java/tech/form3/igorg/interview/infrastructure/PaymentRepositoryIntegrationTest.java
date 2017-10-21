@@ -6,19 +6,20 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import tech.form3.igorg.interview.infrastructure.config.Form3InfrastructureConfig;
 import tech.form3.igorg.interview.infrastructure.repository.PaymentRepository;
+import tech.form3.igorg.interview.model.exception.Form3EntityNotFoundException;
+import tech.form3.igorg.interview.model.exception.Form3OptimisticLockException;
 import tech.form3.igorg.interview.model.payment.BeneficiaryParty;
 import tech.form3.igorg.interview.model.payment.Payment;
 import tech.form3.igorg.interview.model.payment.PaymentAttributes;
 
 import java.math.BigDecimal;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 
@@ -72,6 +73,20 @@ public class PaymentRepositoryIntegrationTest {
     }
 
     @Test
+    public void shouldFailToGetNonexistentPayment() {
+        // given
+        String nonExistentPaymentId = "non-existent-payment-id";
+        expectedException.expect(Form3EntityNotFoundException.class);
+        expectedException.expectMessage("The Payment with id 'non-existent-payment-id' was not found");
+
+        // when
+        paymentRepository.findOne(nonExistentPaymentId);
+
+        // then
+        // expect exception to be thrown
+    }
+
+    @Test
     public void shouldGetPaymentAndCheckVersionSuccessfully() {
         // given
         Payment payment = createAndSavePayment();
@@ -87,8 +102,8 @@ public class PaymentRepositoryIntegrationTest {
     public void shouldGetPaymentAndFailOnVersionMismatch() {
         // given
         Payment payment = createAndSavePayment();
-        expectedException.expect(OptimisticLockingFailureException.class);
-        expectedException.expectMessage("A new version of the 'Payment' is available");
+        expectedException.expect(Form3OptimisticLockException.class);
+        expectedException.expectMessage("The provided Payment with id '" + payment.getId() + "' has a different version than the saved one");
 
         // when
         paymentRepository.findOne(payment.getId(), 1);
@@ -120,7 +135,7 @@ public class PaymentRepositoryIntegrationTest {
         paymentRepository.delete(payment.getId());
 
         // then
-        assertThat(paymentRepository.findOne(payment.getId()), is(nullValue()));
+        assertThat(paymentRepository.exists(payment.getId()), equalTo(false));
     }
 
     private Payment createAndSavePayment() {
