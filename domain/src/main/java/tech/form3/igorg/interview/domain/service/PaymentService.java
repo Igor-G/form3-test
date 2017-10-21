@@ -58,7 +58,7 @@ public class PaymentService {
     public Payment updatePayment(Payment paymentUpdate) {
         Payment payment = paymentRepository.findOne(paymentUpdate.getId(), paymentUpdate.getVersion());
         payment.setOrganizationId(paymentUpdate.getOrganizationId());
-        payment.setPaymentAttributes(paymentUpdate.getPaymentAttributes());
+        payment.setAttributes(paymentUpdate.getAttributes());
         return paymentRepository.save(payment);
     }
 

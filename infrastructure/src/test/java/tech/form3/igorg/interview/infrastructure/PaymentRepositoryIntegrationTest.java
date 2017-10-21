@@ -48,15 +48,15 @@ public class PaymentRepositoryIntegrationTest {
         BeneficiaryParty beneficiaryParty = new BeneficiaryParty();
         beneficiaryParty.setAccountName(accountName);
         paymentAttributes.setBeneficiaryParty(beneficiaryParty);
-        payment.setPaymentAttributes(paymentAttributes);
+        payment.setAttributes(paymentAttributes);
 
         // when
         Payment savedPayment = paymentRepository.save(payment);
 
         // then
         assertThat(savedPayment.getId(), equalTo(payment.getId()));
-        assertThat(savedPayment.getPaymentAttributes().getAmount(), equalTo(amount));
-        assertThat(savedPayment.getPaymentAttributes().getBeneficiaryParty().getAccountName(), equalTo(accountName));
+        assertThat(savedPayment.getAttributes().getAmount(), equalTo(amount));
+        assertThat(savedPayment.getAttributes().getBeneficiaryParty().getAccountName(), equalTo(accountName));
     }
 
     @Test
@@ -102,13 +102,13 @@ public class PaymentRepositoryIntegrationTest {
         // given
         Payment payment = createAndSavePayment();
         BigDecimal newAmount = new BigDecimal("11.23");
-        payment.getPaymentAttributes().setAmount(newAmount);
+        payment.getAttributes().setAmount(newAmount);
 
         // when
         Payment paymentFromDb = paymentRepository.save(payment);
 
         // then
-        assertThat(paymentFromDb.getPaymentAttributes().getAmount(), equalTo(newAmount));
+        assertThat(paymentFromDb.getAttributes().getAmount(), equalTo(newAmount));
     }
 
     @Test
@@ -128,7 +128,7 @@ public class PaymentRepositoryIntegrationTest {
         PaymentAttributes paymentAttributes = new PaymentAttributes();
         BigDecimal amount = new BigDecimal("23.43");
         paymentAttributes.setAmount(amount);
-        payment.setPaymentAttributes(paymentAttributes);
+        payment.setAttributes(paymentAttributes);
         return paymentRepository.save(payment);
     }
 

@@ -33,7 +33,7 @@ public class PaymentResourceConverterTest {
         // then
         assertThat(payment.getId(), equalTo(paymentResource.getId()));
         assertThat(payment.getOrganizationId(), equalTo(paymentResource.getOrganizationId()));
-        assertThat(payment.getPaymentAttributes(), equalTo(paymentResource.getAttributes()));
+        assertThat(payment.getAttributes(), equalTo(paymentResource.getAttributes()));
         assertThat(payment.getVersion(), equalTo(paymentResource.getVersion()));
     }
 }

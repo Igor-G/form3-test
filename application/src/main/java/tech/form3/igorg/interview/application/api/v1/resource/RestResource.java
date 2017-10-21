@@ -3,27 +3,22 @@ package tech.form3.igorg.interview.application.api.v1.resource;
 import lombok.Getter;
 import org.springframework.hateoas.Link;
 import org.springframework.util.Assert;
-import tech.form3.igorg.interview.application.dto.PaymentDto;
-import tech.form3.igorg.interview.model.payment.Payment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Payments resource.
+ * Rest resource.
  */
 @Getter
-public class PaymentsResource {
+public class RestResource<T> {
 
     private final List<Link> links = new ArrayList<>();
 
-    private List<PaymentDto> data;
+    private final T data;
 
-    public PaymentsResource(List<Payment> payments) {
-        data = payments.stream()
-                .map(PaymentDto::new)
-                .collect(Collectors.toList());
+    public RestResource(T data) {
+        this.data = data;
     }
 
     /**
@@ -35,4 +30,5 @@ public class PaymentsResource {
         Assert.notNull(link, "Link must not be null!");
         this.links.add(link);
     }
+
 }

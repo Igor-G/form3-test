@@ -89,7 +89,7 @@ public class PaymentServiceTest {
         paymentUpdate.setOrganizationId("new-org-id");
         PaymentAttributes newPaymentAttributes = new PaymentAttributes();
         newPaymentAttributes.setAmount(new BigDecimal("5678"));
-        paymentUpdate.setPaymentAttributes(newPaymentAttributes);
+        paymentUpdate.setAttributes(newPaymentAttributes);
 
         given(paymentRepository.findOne(paymentUpdate.getId(), paymentUpdate.getVersion())).willReturn(paymentFromDb);
         given(paymentRepository.save(any(Payment.class))).willAnswer(returnsFirstArg());
@@ -100,7 +100,7 @@ public class PaymentServiceTest {
         // then
         assertThat(payment, sameInstance(paymentFromDb));
         assertThat(paymentFromDb.getOrganizationId(), equalTo("new-org-id"));
-        assertThat(paymentFromDb.getPaymentAttributes(), equalTo(newPaymentAttributes));
+        assertThat(paymentFromDb.getAttributes(), equalTo(newPaymentAttributes));
         verify(paymentRepository).save(paymentFromDb);
     }
 

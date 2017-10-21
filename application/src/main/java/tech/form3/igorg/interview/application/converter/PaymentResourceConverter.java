@@ -16,7 +16,7 @@ public class PaymentResourceConverter implements Converter<PaymentResource, Paym
         payment.setId(paymentResource.getId());
         payment.setVersion(paymentResource.getVersion());
         payment.setOrganizationId(paymentResource.getOrganizationId());
-        payment.setPaymentAttributes(paymentResource.getAttributes());
+        payment.setAttributes(paymentResource.getAttributes());
         return payment;
     }
 }

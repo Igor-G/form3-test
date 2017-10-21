@@ -6,9 +6,12 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tech.form3.igorg.interview.application.api.v1.resource.PaymentResource;
-import tech.form3.igorg.interview.application.api.v1.resource.PaymentsResource;
+import tech.form3.igorg.interview.application.api.v1.resource.RestResource;
 import tech.form3.igorg.interview.domain.service.PaymentService;
 import tech.form3.igorg.interview.model.payment.Payment;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -27,31 +30,37 @@ public class PaymentController {
 
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping("/")
-    public PaymentResource createPayment() {
-        PaymentResource paymentResource = new PaymentResource(paymentService.createNewPayment());
+    public RestResource<PaymentResource> createPayment() {
+        RestResource<PaymentResource> paymentResource =
+                new RestResource<>(new PaymentResource(paymentService.createNewPayment()));
         paymentResource.add(linkTo(methodOn(PaymentController.class).createPayment()).withSelfRel());
         return paymentResource;
     }
 
     @GetMapping("/{paymentId}")
-    public PaymentResource getPayment(@PathVariable("paymentId") String paymentId) {
-        PaymentResource paymentResource = new PaymentResource(paymentService.getPayment(paymentId));
+    public RestResource<PaymentResource> getPayment(@PathVariable("paymentId") String paymentId) {
+        RestResource<PaymentResource> paymentResource =
+                new RestResource<>(new PaymentResource(paymentService.getPayment(paymentId)));
         paymentResource.add(linkTo(methodOn(PaymentController.class).getPayment(paymentId)).withSelfRel());
         return paymentResource;
     }
 
     @GetMapping("/")
-    public PaymentsResource getAllPayments() {
-        PaymentsResource paymentResource = new PaymentsResource(paymentService.getAllPayments());
+    public RestResource<List<PaymentResource>> getAllPayments() {
+        List<PaymentResource> paymentsResource = paymentService.getAllPayments().stream()
+                                                                        .map(PaymentResource::new)
+                                                                        .collect(Collectors.toList());
+        RestResource<List<PaymentResource>> paymentResource = new RestResource<>(paymentsResource);
         paymentResource.add(linkTo(methodOn(PaymentController.class).getAllPayments()).withSelfRel());
         return paymentResource;
     }
 
-    @PutMapping("/{paymentId}")
-    public PaymentResource updatePayment(@PathVariable("paymentId") String paymentId,
+    @PatchMapping("/{paymentId}")
+    public RestResource<PaymentResource> updatePayment(@PathVariable("paymentId") String paymentId,
                                          @RequestBody PaymentResource paymentResource) {
         Payment payment = conversionService.convert(paymentResource, Payment.class);
-        PaymentResource updatedPaymentResource = new PaymentResource(paymentService.updatePayment(payment));
+        RestResource<PaymentResource> updatedPaymentResource =
+                new RestResource<>(new PaymentResource(paymentService.updatePayment(payment)));
         updatedPaymentResource.add(linkTo(methodOn(PaymentController.class)
                 .updatePayment(paymentId, paymentResource)).withSelfRel());
         return updatedPaymentResource;
