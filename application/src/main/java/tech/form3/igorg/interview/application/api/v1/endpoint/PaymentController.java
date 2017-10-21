@@ -4,13 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import tech.form3.igorg.interview.application.api.v1.resource.PaymentResource;
+import tech.form3.igorg.interview.application.api.v1.resource.PaymentUpdateResource;
 import tech.form3.igorg.interview.application.api.v1.resource.RestResource;
 import tech.form3.igorg.interview.domain.service.PaymentService;
 import tech.form3.igorg.interview.model.payment.Payment;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -60,10 +64,14 @@ public class PaymentController {
 
     @PatchMapping("/{paymentId}")
     public RestResource<PaymentResource> updatePayment(@PathVariable("paymentId") String paymentId,
-                                         @RequestBody PaymentResource paymentResource) {
-        Payment payment = conversionService.convert(paymentResource, Payment.class);
-        RestResource<PaymentResource> updatedPaymentResource =
-                new RestResource<>(new PaymentResource(paymentService.updatePayment(payment)));
+                                           @RequestBody @Valid RestResource<PaymentUpdateResource> paymentResource) {
+        Assert.isTrue(paymentId.equals(paymentResource.getData().getId()),
+                "The id in the path must match the one in the body");
+        Integer version = paymentResource.getData().getVersion();
+        Map<String, Object> attributeUpdates = paymentResource.getData().getAttributes();
+        Payment updatedPayment = paymentService.updatePayment(paymentId, version, attributeUpdates);
+        RestResource<PaymentResource> updatedPaymentResource = new RestResource<>(new PaymentResource(updatedPayment));
+
         updatedPaymentResource.add(linkTo(methodOn(PaymentController.class)
                 .updatePayment(paymentId, paymentResource)).withSelfRel());
         return updatedPaymentResource;

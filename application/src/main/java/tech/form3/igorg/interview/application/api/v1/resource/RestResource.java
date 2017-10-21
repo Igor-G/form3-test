@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.hateoas.Link;
 import org.springframework.util.Assert;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class RestResource<T> {
 
     private final List<Link> links = new ArrayList<>();
 
+    @Valid
     private T data;
 
     public RestResource(T data) {

@@ -6,8 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.form3.igorg.interview.infrastructure.repository.PaymentRepository;
 import tech.form3.igorg.interview.model.payment.Payment;
+import tech.form3.igorg.interview.model.payment.PaymentAttributes;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -20,6 +22,8 @@ import static com.google.common.collect.Lists.newArrayList;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+
+    private final PaymentAttributeUpdatesMerger attributeUpdatesMerger;
 
     /**
      * Creates a new (empty) payment.
@@ -55,13 +59,14 @@ public class PaymentService {
     /**
      * Updates the provided payment.
      *
-     * @param paymentUpdate the payment containing the updates
+     * @param attributeUpdates the map containing the attribute updates
      * @return the updated (saved) payment
      */
-    public Payment updatePayment(Payment paymentUpdate) {
-        Payment payment = paymentRepository.findOne(paymentUpdate.getId(), paymentUpdate.getVersion());
-        payment.setOrganizationId(paymentUpdate.getOrganizationId());
-        payment.setAttributes(paymentUpdate.getAttributes());
+    public Payment updatePayment(String paymentId, Integer paymentVersion, Map<String, Object> attributeUpdates) {
+        Payment payment = paymentRepository.findOne(paymentId, paymentVersion);
+        PaymentAttributes updatedAttributes =
+                attributeUpdatesMerger.mergeAttributeUpdates(payment.getAttributes(), attributeUpdates);
+        payment.setAttributes(updatedAttributes);
         return paymentRepository.save(payment);
     }
 

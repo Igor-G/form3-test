@@ -9,8 +9,9 @@ import tech.form3.igorg.interview.infrastructure.repository.PaymentRepository;
 import tech.form3.igorg.interview.model.payment.Payment;
 import tech.form3.igorg.interview.model.payment.PaymentAttributes;
 
-import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections4.CollectionUtils.isEqualCollection;
@@ -32,6 +33,9 @@ public class PaymentServiceTest {
 
     @Mock
     private PaymentRepository paymentRepository;
+
+    @Mock
+    private PaymentAttributeUpdatesMerger attributeUpdatesMerger;
 
     @InjectMocks
     private PaymentService paymentService;
@@ -88,23 +92,24 @@ public class PaymentServiceTest {
         Payment paymentFromDb = new Payment();
         paymentFromDb.setOrganizationId("old-org-id");
 
-        Payment paymentUpdate = new Payment();
-        paymentUpdate.setVersion(2);
-        paymentUpdate.setOrganizationId("new-org-id");
-        PaymentAttributes newPaymentAttributes = new PaymentAttributes();
-        newPaymentAttributes.setAmount(new BigDecimal("5678"));
-        paymentUpdate.setAttributes(newPaymentAttributes);
+        String paymentId = paymentFromDb.getId();
+        Integer version = 1;
 
-        given(paymentRepository.findOne(paymentUpdate.getId(), paymentUpdate.getVersion())).willReturn(paymentFromDb);
+        Map<String, Object> attributeUpdates = new HashMap<>();
+        PaymentAttributes paymentAttributes = new PaymentAttributes();
+
+        given(attributeUpdatesMerger.mergeAttributeUpdates(paymentFromDb.getAttributes(), attributeUpdates)).willReturn(paymentAttributes);
+        given(paymentRepository.findOne(paymentId, version)).willReturn(paymentFromDb);
         given(paymentRepository.save(any(Payment.class))).willAnswer(returnsFirstArg());
 
         // when
-        Payment payment = paymentService.updatePayment(paymentUpdate);
+        Payment payment = paymentService.updatePayment(paymentId, version, attributeUpdates);
 
         // then
         assertThat(payment, sameInstance(paymentFromDb));
-        assertThat(paymentFromDb.getOrganizationId(), equalTo("new-org-id"));
-        assertThat(paymentFromDb.getAttributes(), equalTo(newPaymentAttributes));
+        assertThat(payment.getAttributes(), sameInstance(paymentAttributes));
+        verify(paymentRepository).findOne(paymentId, version);
+        verify(attributeUpdatesMerger).mergeAttributeUpdates(null, attributeUpdates);
         verify(paymentRepository).save(paymentFromDb);
     }
 
