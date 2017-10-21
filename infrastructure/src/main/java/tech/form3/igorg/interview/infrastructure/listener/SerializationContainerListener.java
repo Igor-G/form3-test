@@ -17,7 +17,8 @@ import java.util.Map;
  */
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class SerializationContainerListener implements PostLoadEventListener, MergeEventListener {
+public class SerializationContainerListener
+        implements PostLoadEventListener, PersistEventListener, MergeEventListener {
 
     private final ObjectMapper objectMapper;
 
@@ -36,7 +37,25 @@ public class SerializationContainerListener implements PostLoadEventListener, Me
 
     @Override
     public void onMerge(MergeEvent event) throws HibernateException {
-        Object entity = event.getEntity();
+        serialize(event.getEntity());
+    }
+
+    @Override
+    public void onMerge(MergeEvent event, Map copiedAlready) throws HibernateException {
+        serialize(event.getEntity());
+    }
+
+    @Override
+    public void onPersist(PersistEvent event) throws HibernateException {
+        serialize(event.getObject());
+    }
+
+    @Override
+    public void onPersist(PersistEvent event, Map createdAlready) throws HibernateException {
+        serialize(event.getObject());
+    }
+
+    private void serialize(Object entity) {
         if (SerializationContainer.class.isAssignableFrom(entity.getClass())) {
             try {
                 ((SerializationContainer) entity).serialize(objectMapper);
@@ -47,8 +66,4 @@ public class SerializationContainerListener implements PostLoadEventListener, Me
         }
     }
 
-    @Override
-    public void onMerge(MergeEvent event, Map copiedAlready) throws HibernateException {
-        onMerge(event);
-    }
 }

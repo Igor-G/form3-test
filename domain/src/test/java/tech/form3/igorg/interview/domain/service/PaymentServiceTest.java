@@ -14,7 +14,8 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.apache.commons.collections4.CollectionUtils.isEqualCollection;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -38,15 +39,18 @@ public class PaymentServiceTest {
     @Test
     public void shouldCreateNewEmptyPayment() {
         // given
-        Payment mockPayment = mock(Payment.class);
-        given(paymentRepository.save(any(Payment.class))).willReturn(mockPayment);
+        Payment payment = new Payment();
+        payment.setOrganizationId("org-id");
+        payment.setAttributes(new PaymentAttributes());
+        given(paymentRepository.save(any(Payment.class))).willAnswer(returnsFirstArg());
 
         // when
-        Payment payment = paymentService.createNewPayment();
+        Payment newPayment = paymentService.createNewPayment(payment);
 
         // then
-        assertThat(payment, sameInstance(mockPayment));
-        verify(paymentRepository).save(any(Payment.class));
+        verify(paymentRepository).save(newPayment);
+        assertThat(newPayment.getOrganizationId(), equalTo("org-id"));
+        assertThat(newPayment.getAttributes(), equalTo(payment.getAttributes()));
     }
 
     @Test

@@ -26,8 +26,11 @@ public class PaymentService {
      *
      * @return the newly created payment
      */
-    public Payment createNewPayment() {
-        return paymentRepository.save(new Payment());
+    public Payment createNewPayment(Payment payment) {
+        Payment newPayment = new Payment();
+        newPayment.setOrganizationId(payment.getOrganizationId());
+        newPayment.setAttributes(payment.getAttributes());
+        return paymentRepository.save(newPayment);
     }
 
     /**

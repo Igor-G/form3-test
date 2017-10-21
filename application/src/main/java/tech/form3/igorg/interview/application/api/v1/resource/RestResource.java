@@ -1,6 +1,8 @@
 package tech.form3.igorg.interview.application.api.v1.resource;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.hateoas.Link;
 import org.springframework.util.Assert;
 
@@ -11,11 +13,13 @@ import java.util.List;
  * Rest resource.
  */
 @Getter
+@Setter
+@NoArgsConstructor
 public class RestResource<T> {
 
     private final List<Link> links = new ArrayList<>();
 
-    private final T data;
+    private T data;
 
     public RestResource(T data) {
         this.data = data;

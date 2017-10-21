@@ -30,10 +30,13 @@ public class PaymentController {
 
     @ResponseStatus(code = HttpStatus.CREATED)
     @PostMapping("/")
-    public RestResource<PaymentResource> createPayment() {
+    public RestResource<PaymentResource> createPayment(
+            @RequestBody RestResource<PaymentResource> paymentResourceRestResource) {
+        Payment payment = conversionService.convert(paymentResourceRestResource.getData(), Payment.class);
         RestResource<PaymentResource> paymentResource =
-                new RestResource<>(new PaymentResource(paymentService.createNewPayment()));
-        paymentResource.add(linkTo(methodOn(PaymentController.class).createPayment()).withSelfRel());
+                new RestResource<>(new PaymentResource(paymentService.createNewPayment(payment)));
+
+        paymentResource.add(linkTo(methodOn(PaymentController.class).createPayment(paymentResource)).withSelfRel());
         return paymentResource;
     }
 

@@ -42,6 +42,8 @@ public class Form3InfrastructureConfig {
                 .appendListener(serializationContainerListener);
         registry.getEventListenerGroup(EventType.MERGE)
                 .appendListener(serializationContainerListener);
+        registry.getEventListenerGroup(EventType.PERSIST)
+                .appendListener(serializationContainerListener);
     }
 
 }
